@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Consistencia y microservicios &middot; ADSO-3145556</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--ground:#F4F7F4;--surface:#FFFFFF;--sunk:#EDF1ED;--ink:#101815;--ink2:#3D4E46;--ink3:#6B7C73;
+--line:#DCE4DE;--lineS:#C2CEC6;--accent:#2C6E31;--accentS:#E2EFE1;
+--fd:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+--fb:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+--fm:"IBM Plex Mono",ui-monospace,Consolas,monospace;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+--ground:#0D1211;--surface:#151C19;--sunk:#101614;--ink:#E7EEE9;--ink2:#B3C2B9;--ink3:#83948B;
+--line:#26312B;--lineS:#35443C;--accent:#6FC05C;--accentS:#1B2B1D;}}
+:root[data-theme="dark"]{--ground:#0D1211;--surface:#151C19;--sunk:#101614;--ink:#E7EEE9;--ink2:#B3C2B9;--ink3:#83948B;
+--line:#26312B;--lineS:#35443C;--accent:#6FC05C;--accentS:#1B2B1D;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:40px 20px 90px;display:flex;flex-direction:column;gap:34px}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+h1{font-family:var(--fd);font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.03;letter-spacing:-.015em;margin:0 0 10px;text-wrap:balance}
+p.lede{margin:0;max-width:66ch;color:var(--ink2)}
+.back{font-family:var(--fm);font-size:12.5px}
+code{font-family:var(--fm);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:2px}
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);background:var(--surface);
+  padding:22px 24px;border-left:3px solid var(--accent);transition:transform .12s ease}
+.card:hover{transform:translateX(3px)}
+.card h2{font-family:var(--fd);font-size:1.4rem;margin:0 0 6px;color:var(--ink)}
+.card p{margin:0;color:var(--ink2);max-width:68ch;font-size:14px}
+.card .stats{font-family:var(--fm);font-size:12px;color:var(--ink3);margin-top:10px}
+footer{border-top:1px solid var(--line);padding-top:16px}
+footer p{font-size:13px;color:var(--ink3);max-width:70ch;margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div><a class="back" href="../../index.html">&larr; volver a la bitacora de informes</a></div>
+
+  <header>
+    <div class="eyebrow">ADSO-3145556 &middot; code-sena &middot; corte 2026-09-22</div>
+    <h1>Consistencia 01&rarr;06-data y recorte a microservicios</h1>
+    <p class="lede">Dos piezas del mismo corte: primero se audit&oacute; d&oacute;nde
+      los 10 proyectos de la ficha se contradicen a s&iacute; mismos entre secciones,
+      despu&eacute;s se propuso, para cada uno, c&oacute;mo llevar su n&uacute;cleo de
+      negocio a microservicios.</p>
+  </header>
+
+  <div class="cards">
+    <a class="card" href="consistencia/index.html">
+      <h2>Consistencia 01&rarr;06-data</h2>
+      <p>Cruce entre <code>01-context</code>, <code>02-domain</code>, <code>03-product</code>,
+        <code>04-requirements</code> y <code>06-data</code> en los 10 repos de proyecto,
+        con nivel de normalizaci&oacute;n y conteo de entidades por equipo.</p>
+      <div class="stats">10 equipos &middot; 5 con normalization-assessment.md propio &middot; 1 con 0 commits reales</div>
+    </a>
+
+    <a class="card" href="microservicios/index.html">
+      <h2>Recorte a microservicios</h2>
+      <p>Para cada proyecto: el n&uacute;cleo de negocio en 3FN sin seguridad ni
+        parametrizaci&oacute;n b&aacute;sica, 4 dominios reales propuestos, y por
+        qu&eacute; ese ajuste conviene espec&iacute;ficamente a ese proyecto.</p>
+      <div class="stats">10 equipos &middot; 8 con modelo real traducido &middot; 2 marcados como reconstrucci&oacute;n</div>
+    </a>
+  </div>
+
+  <footer>
+    <p>Generado a partir de un snapshot de solo lectura de los 10 repos
+      <code>{prefijo}-docs</code> de <code>code-sena</code>. Continúa el trabajo del
+      2026-09-08 (<a href="../2026-09-08-congruencia-datamodel/index.html">Congruencia 02-03-06 y contrapropuesta de modelo de datos</a>),
+      con hallazgos nuevos verificados de forma independiente en este corte.</p>
+  </footer>
+</div>
+</body>
+</html>

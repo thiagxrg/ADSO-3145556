@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Recorte a microservicios &middot; ADSO-3145556</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--ground:#F4F7F4;--surface:#FFFFFF;--sunk:#EDF1ED;--ink:#101815;--ink2:#3D4E46;--ink3:#6B7C73;
+--line:#DCE4DE;--lineS:#C2CEC6;--accent:#2C6E31;--accentS:#E2EFE1;--warn:#8A5300;--warnS:#F7EBD8;
+--fd:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+--fb:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+--fm:"IBM Plex Mono",ui-monospace,Consolas,monospace;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+--ground:#0D1211;--surface:#151C19;--sunk:#101614;--ink:#E7EEE9;--ink2:#B3C2B9;--ink3:#83948B;
+--line:#26312B;--lineS:#35443C;--accent:#6FC05C;--accentS:#1B2B1D;--warn:#D69B3E;--warnS:#2C2418;}}
+:root[data-theme="dark"]{--ground:#0D1211;--surface:#151C19;--sunk:#101614;--ink:#E7EEE9;--ink2:#B3C2B9;--ink3:#83948B;
+--line:#26312B;--lineS:#35443C;--accent:#6FC05C;--accentS:#1B2B1D;--warn:#D69B3E;--warnS:#2C2418;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:38px 20px 90px;display:flex;flex-direction:column;gap:36px}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+h1{font-family:var(--fd);font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.03;letter-spacing:-.015em;margin:0 0 10px;text-wrap:balance}
+h2{font-family:var(--fd);font-size:1.05rem;margin:0}
+p{margin:.5em 0;max-width:74ch;color:var(--ink2)}
+.lede{max-width:70ch}
+.back{font-family:var(--fm);font-size:12.5px}
+code{font-family:var(--fm);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:2px}
+.hero{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center;padding:18px 22px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent)}
+.hero .big{font-family:var(--fd);font-size:44px;font-weight:700;line-height:.95;color:var(--accent);font-variant-numeric:tabular-nums}
+.hero .cap{font-size:13.5px;color:var(--ink2);max-width:50ch}
+.warn{background:var(--warnS);border:1px solid var(--warn);padding:14px 18px}
+.warn p{color:var(--ink);margin:0}
+.warn b{color:var(--warn)}
+.method{border:1px solid var(--line);background:var(--surface);padding:16px 20px;display:flex;flex-direction:column;gap:8px}
+.method ul{margin:0;padding-left:1.1em}
+.method li{margin-bottom:4px;font-size:14px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.card.special{border-color:var(--warn)}
+.card h3{font-family:var(--fd);font-size:1.05rem;margin:0}
+.card .tag{display:inline-block;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--accentS);color:var(--accent);padding:2px 7px;align-self:flex-start}
+.card.special .tag{background:var(--warnS);color:var(--warn)}
+.dom{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.dom li{font-size:13px;color:var(--ink2);padding-left:1.1em;position:relative}
+.dom li::before{content:"—";position:absolute;left:0;color:var(--ink3)}
+.files{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--fm);font-size:12px;margin-top:2px}
+.files a{border:1px solid var(--lineS);padding:3px 8px;text-decoration:none;color:var(--ink2)}
+.files a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--line);padding-top:16px}
+footer p{font-size:13px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div><a class="back" href="../index.html">&larr; volver al informe del 2026-09-22</a></div>
+
+  <header>
+    <div class="eyebrow">ADSO-3145556 &middot; code-sena</div>
+    <h1>Recorte a microservicios: 4 dominios y modelo 3FN por equipo</h1>
+    <p class="lede">Para cada uno de los 10 proyectos: el nucleo de negocio en 3FN
+      excluyendo seguridad y parametrizacion basica, 4 dominios reales propuestos
+      para una eventual particion en microservicios, y el porque especifico a
+      cada proyecto.</p>
+  </header>
+
+  <div class="hero">
+    <div><div class="big">10</div><div class="cap">equipos</div></div>
+    <div class="cap">8 con modelo real traducido de su propio <code>06-data</code>;
+      2 marcados como reconstruccion (ver tarjetas con borde ambar).</div>
+  </div>
+
+  <div class="method">
+    <h2>Metodo</h2>
+    <ul>
+      <li>Fuente: los 10 repos <code>{prefijo}-docs</code> de <code>code-sena</code>, mismo corte que el informe de consistencia.</li>
+      <li><b>Seguridad</b> (usuarios, roles, permisos, sesiones, auditoria) se excluyo siempre: ya es su propio servicio en el diseno de cada equipo.</li>
+      <li><b>Parametrizacion basica</b> (catalogos de valor fijo sin logica propia) se excluyo equipo por equipo, verificando primero si la tabla tenia una regla de negocio real detras.</li>
+      <li>Los 4 dominios se apoyaron, cuando existian, en la propia clasificacion del equipo (bounded contexts, columna "Owner" de servicio, Core/Supporting/Generic) &mdash; no se inventaron limites nuevos donde el equipo ya los habia decidido.</li>
+      <li>Los 10 <code>modelo-3fn.sql</code> se verificaron: parentesis balanceados, cero referencias hacia adelante, cero tablas duplicadas.</li>
+    </ul>
+  </div>
+
+  <section>
+    <div class="grid">
+
+      <div class="card">
+        <span class="tag">Ejemplar</span>
+        <h3>edu-air-control</h3>
+        <ul class="dom">
+          <li>Gestion de Espacios</li>
+          <li>Gestion de Sensores</li>
+          <li>Monitoreo y Analisis Ambiental (con alertas)</li>
+          <li>Experiencia de Usuario</li>
+        </ul>
+        <div class="files">
+          <a href="ea-control/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="ea-control/dominios-microservicios.md">dominios.md</a>
+          <a href="ea-control/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>energy-monitor</h3>
+        <ul class="dom">
+          <li>Gestion de Viviendas</li>
+          <li>Gestion de Dispositivos</li>
+          <li>Monitoreo y Alertas</li>
+          <li>Recomendaciones</li>
+        </ul>
+        <div class="files">
+          <a href="en-monitor/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="en-monitor/dominios-microservicios.md">dominios.md</a>
+          <a href="en-monitor/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>faceattend-edu</h3>
+        <ul class="dom">
+          <li>Gestion Academica</li>
+          <li>Programacion de Clases</li>
+          <li>Asistencia y Alertas</li>
+          <li>Reconocimiento Biometrico</li>
+        </ul>
+        <div class="files">
+          <a href="fae/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="fae/dominios-microservicios.md">dominios.md</a>
+          <a href="fae/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">Ejemplar</span>
+        <h3>rent-car</h3>
+        <ul class="dom">
+          <li>Flota y Mantenimiento</li>
+          <li>Reserva y Alquiler (fusiona ejecucion + notificacion)</li>
+          <li>Pagos y Facturacion</li>
+          <li>Telemetria y GPS</li>
+        </ul>
+        <div class="files">
+          <a href="rtm/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="rtm/dominios-microservicios.md">dominios.md</a>
+          <a href="rtm/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>save-your-water</h3>
+        <ul class="dom">
+          <li>Lugares y Dispositivos</li>
+          <li>Consumo y Facturacion</li>
+          <li>Control de Valvula</li>
+          <li>Alertas y Notificaciones</li>
+        </ul>
+        <p style="font-size:12.5px;margin-top:-4px">El propio equipo ya tenia esta agrupacion exacta en su columna &ldquo;Owner:&rdquo; de servicio.</p>
+        <div class="files">
+          <a href="sy-water/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="sy-water/dominios-microservicios.md">dominios.md</a>
+          <a href="sy-water/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card special">
+        <span class="tag">Sin proyecto real</span>
+        <h3>school-guardian</h3>
+        <p style="font-size:13px;margin-top:-4px">Un solo commit en <code>sg-docs</code>: el scaffold del instructor. Lo de aqui es una <b>propuesta de linea base desde cero</b>, no un recorte del trabajo del equipo.</p>
+        <ul class="dom">
+          <li>Rutas y Paradas (propuesto)</li>
+          <li>Estudiantes y Acudientes (propuesto)</li>
+          <li>Seguimiento en Tiempo Real (propuesto)</li>
+          <li>Notificaciones a Acudientes (propuesto)</li>
+        </ul>
+        <div class="files">
+          <a href="sg/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="sg/dominios-microservicios.md">dominios.md</a>
+          <a href="sg/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">El mas riguroso</span>
+        <h3>translates-sign-language</h3>
+        <ul class="dom">
+          <li>Reconocimiento y Traduccion (Core)</li>
+          <li>Aprendizaje y Lexico</li>
+          <li>Analitica de Uso</li>
+          <li>Perfil y Preferencias</li>
+        </ul>
+        <div class="files">
+          <a href="trans-sl/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="trans-sl/dominios-microservicios.md">dominios.md</a>
+          <a href="trans-sl/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>vehicle-washing</h3>
+        <ul class="dom">
+          <li>Clientes y Vehiculos</li>
+          <li>Catalogo y Reservas</li>
+          <li>Operacion y Ejecucion</li>
+          <li>Pagos, Promociones y Fidelizacion</li>
+        </ul>
+        <p style="font-size:12.5px;margin-top:-4px">Hallazgo: <code>Rating</code> es entidad propia en 02-domain pero solo 3 columnas en 06-data &mdash; queda documentado, no corregido.</p>
+        <div class="files">
+          <a href="vehicle-w/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="vehicle-w/dominios-microservicios.md">dominios.md</a>
+          <a href="vehicle-w/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>woman-alert</h3>
+        <ul class="dom">
+          <li>Gestion de Alertas (Core)</li>
+          <li>Zonas y Recursos de Ayuda</li>
+          <li>Evidencia</li>
+          <li>Contactos y Notificaciones</li>
+        </ul>
+        <div class="files">
+          <a href="wal/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="wal/dominios-microservicios.md">dominios.md</a>
+          <a href="wal/README.md">README.md</a>
+        </div>
+      </div>
+
+      <div class="card special">
+        <span class="tag">Reconstruido</span>
+        <h3>your-event</h3>
+        <p style="font-size:13px;margin-top:-4px">Los archivos canonicos siguen siendo plantilla. Reconstruido desde <code>06-data/evidence/models.md</code>, una instantanea que a su vez cita un repo externo no verificable desde <code>code-sena</code>.</p>
+        <ul class="dom">
+          <li>Eventos y Venues</li>
+          <li>Boleteria y Asientos</li>
+          <li>Pagos y Billetera</li>
+          <li>Perfil y Notificaciones</li>
+        </ul>
+        <div class="files">
+          <a href="yev/modelo-3fn.sql">modelo-3fn.sql</a>
+          <a href="yev/dominios-microservicios.md">dominios.md</a>
+          <a href="yev/README.md">README.md</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="warn">
+    <p><b>Dos casos no son un recorte del trabajo real:</b> <code>school-guardian</code>
+      (0 commits reales desde el scaffold) y <code>your-event</code> (modelo real fuera
+      del repositorio). Ambos quedan marcados en su propio README y en las tarjetas
+      de arriba &mdash; no se presentan como equivalentes a los otros 8.</p>
+  </div>
+
+  <footer>
+    <p>Generado el 2026-09-22 a partir de un snapshot de solo lectura de los 10 repos.
+      Publicado junto con <a href="../consistencia/index.html">el informe de consistencia 01&rarr;06-data</a>
+      del mismo dia.</p>
+  </footer>
+</div>
+</body>
+</html>

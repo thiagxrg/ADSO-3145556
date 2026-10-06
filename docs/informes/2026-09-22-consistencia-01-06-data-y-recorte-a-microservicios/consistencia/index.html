@@ -1,0 +1,777 @@
+<title>Auditoría ADSO-3145556</title>
+<style>
+  :root{
+    --paper:#f3f6f5;
+    --surface:#ffffff;
+    --surface-2:#e9eeee;
+    --ink:#121a1f;
+    --muted:#57666c;
+    --faint:#8a969b;
+    --line:#d7e0e0;
+    --accent:#1f6f7a;
+    --accent-ink:#ffffff;
+    --accent-soft:#e2f0f1;
+    --good:#0ca30c;
+    --warning:#b9790c;
+    --critical:#c23a3a;
+    --good-soft:#e3f5e1;
+    --warning-soft:#faedd6;
+    --critical-soft:#fbe4e1;
+    --code-bg:#eef2f1;
+    --shadow: 0 1px 2px rgba(18,26,31,.06), 0 6px 20px -8px rgba(18,26,31,.12);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0e1417;
+      --surface:#161e22;
+      --surface-2:#1c262a;
+      --ink:#e7edee;
+      --muted:#9db0b6;
+      --faint:#647377;
+      --line:#2a373c;
+      --accent:#5cc2cc;
+      --accent-ink:#08171a;
+      --accent-soft:#173236;
+      --good:#4fc44f;
+      --warning:#e6ab3d;
+      --critical:#e9726a;
+      --good-soft:#173322;
+      --warning-soft:#332a15;
+      --critical-soft:#3a1f1c;
+      --code-bg:#1b2428;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -10px rgba(0,0,0,.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0e1417;
+    --surface:#161e22;
+    --surface-2:#1c262a;
+    --ink:#e7edee;
+    --muted:#9db0b6;
+    --faint:#647377;
+    --line:#2a373c;
+    --accent:#5cc2cc;
+    --accent-ink:#08171a;
+    --accent-soft:#173236;
+    --good:#4fc44f;
+    --warning:#e6ab3d;
+    --critical:#e9726a;
+    --good-soft:#173322;
+    --warning-soft:#332a15;
+    --critical-soft:#3a1f1c;
+    --code-bg:#1b2428;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -10px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+    padding-inline:16px;
+  }
+  h1,h2,h3,h4{
+    font-family:"IBM Plex Serif",Georgia,serif;
+    text-wrap:balance;
+    margin:0 0 .4em;
+    color:var(--ink);
+  }
+  code,.mono,.num,.tag,th,td,.badge,.hu-count{
+    font-family:"IBM Plex Mono","SFMono-Regular",Menlo,monospace;
+  }
+  .num{font-variant-numeric:tabular-nums}
+  a{color:var(--accent)}
+  p{margin:.6em 0}
+  .page{max-width:880px;margin:0 auto;padding-block:28px 64px}
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:18px;
+    margin-bottom:28px;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  .masthead h1{font-size:clamp(1.7rem,4.2vw,2.35rem);font-weight:600}
+  .masthead .sub{color:var(--muted);max-width:60ch;font-size:.98rem}
+  .meta-row{
+    display:flex;flex-wrap:wrap;gap:10px 22px;
+    margin-top:16px;font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--muted);
+  }
+  .meta-row b{color:var(--ink);font-weight:600}
+
+  /* ---------- kpi strip ---------- */
+  .kpis{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-bottom:32px;
+  }
+  .kpi{background:var(--surface);padding:16px 14px;}
+  .kpi .n{font-family:"IBM Plex Serif",serif;font-size:1.9rem;font-weight:600;line-height:1}
+  .kpi .l{font-size:.74rem;color:var(--muted);margin-top:6px;line-height:1.3}
+  @media (max-width:620px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+
+  section{margin-bottom:44px}
+  .section-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .section-head h2{font-size:1.3rem}
+  .section-no{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:.85rem}
+  .section-intro{color:var(--muted);max-width:68ch;margin-bottom:18px}
+
+  /* ---------- status chip (icon + label, never color alone) ---------- */
+  .status{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;
+    letter-spacing:.03em;text-transform:uppercase;
+    padding:3px 8px 3px 6px;border-radius:3px;white-space:nowrap;
+  }
+  .status svg{width:11px;height:11px;flex:none}
+  .status.good{background:var(--good-soft);color:var(--good)}
+  .status.warning{background:var(--warning-soft);color:var(--warning)}
+  .status.critical{background:var(--critical-soft);color:var(--critical)}
+
+  /* ---------- semaphore grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:4px;
+    padding:14px 16px;cursor:pointer;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:8px;
+    transition:transform .12s ease;
+  }
+  .card:hover{transform:translateY(-1px)}
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .card h3{font-size:1rem;margin:0}
+  .card-stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+    font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--muted);
+  }
+  .card-stats b{display:block;color:var(--ink);font-size:.95rem;font-weight:600}
+  .card-note{font-size:.78rem;color:var(--muted)}
+
+  /* ---------- cross-cutting callouts ---------- */
+  .finding{
+    border-left:3px solid var(--accent);background:var(--accent-soft);
+    padding:12px 16px;margin:14px 0;border-radius:0 4px 4px 0;
+  }
+  .finding h4{font-size:.92rem;margin-bottom:6px;font-family:"IBM Plex Sans";font-weight:600}
+  .quote{
+    font-family:"IBM Plex Serif",serif;font-style:italic;color:var(--muted);
+    border-left:2px solid var(--line);padding-left:14px;margin:10px 0;font-size:.94rem;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:.86rem}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--surface-2);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right}
+  tr.row-critical td{background:var(--critical-soft)}
+  tr.row-good td:first-child{border-left:3px solid var(--good)}
+
+  /* ---------- accordion (team dossiers) ---------- */
+  .dossier{
+    border:1px solid var(--line);border-radius:4px;background:var(--surface);
+    margin-bottom:8px;overflow:hidden;
+  }
+  .dossier-head{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 16px;background:none;border:none;text-align:left;cursor:pointer;
+    font-family:"IBM Plex Sans";color:var(--ink);
+  }
+  .dossier-head:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .dossier-head .name{display:flex;align-items:center;gap:10px;font-weight:600}
+  .dossier-head .quickstats{
+    display:flex;gap:14px;font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--muted);
+  }
+  .chevron{transition:transform .15s ease;color:var(--faint);flex:none}
+  .dossier[open] .chevron{transform:rotate(90deg)}
+  .dossier-head::-webkit-details-marker{display:none}
+  .dossier-body{padding:2px 18px 20px;border-top:1px solid var(--line)}
+  .dossier-body h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:18px 0 8px;font-family:"IBM Plex Sans";font-weight:600}
+  .dossier-body p{font-size:.92rem}
+  .dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.86rem;margin:10px 0}
+  .dl dt{color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:.76rem}
+  .dl dd{margin:0}
+  ul.tight{margin:6px 0;padding-left:1.2em}
+  ul.tight li{margin-bottom:5px;font-size:.92rem}
+
+  .rank-n{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+    font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:700;flex:none;
+  }
+
+  footer{
+    margin-top:56px;padding-top:18px;border-top:1px solid var(--line);
+    color:var(--faint);font-size:.78rem;
+  }
+  footer p{margin:.4em 0}
+
+  @media (prefers-reduced-motion: reduce){
+    .card,.chevron{transition:none}
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="page">
+
+  <div style="margin-bottom:18px"><a href="../index.html" style="font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--accent)">&larr; volver al informe del 2026-09-22</a></div>
+
+  <div class="masthead">
+    <div class="eyebrow">Auditoría de documentación técnica · code-sena</div>
+    <h1>Consistencia 01→06-data, ficha ADSO-3145556</h1>
+    <p class="sub">Cruce entre <code>01-context</code>, <code>02-domain</code>, <code>03-product</code>,
+      <code>04-requirements</code> y <code>06-data</code> en los 10 repos de proyecto de la ficha —
+      con nivel de normalización y conteo de entidades por equipo.</p>
+    <div class="meta-row">
+      <span>Corte: <b>2026-09-22</b></span>
+      <span>Org: <b>code-sena</b></span>
+      <span>Repos auditados: <b>10 / 10</b></span>
+      <span>Método: <b>lectura verificada, no solo conteo automático</b></span>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n num">8<span style="color:var(--faint);font-size:1.1rem">/10</span></div><div class="l">equipos con modelo de datos real en el repo</div></div>
+    <div class="kpi"><div class="n num">5<span style="color:var(--faint);font-size:1.1rem">/10</span></div><div class="l">escribieron su propio <code style="font-size:.72rem">normalization-assessment.md</code></div></div>
+    <div class="kpi"><div class="n num">183</div><div class="l">tablas distintas documentadas en total</div></div>
+    <div class="kpi"><div class="n num">0</div><div class="l">commits reales de school-guardian desde el scaffold</div></div>
+  </div>
+
+  <section>
+    <div class="section-head"><span class="section-no">01</span><h2>Semáforo por equipo</h2></div>
+    <p class="section-intro">Clic en un equipo para abrir su expediente completo más abajo:
+      entidades, tablas, trazabilidad y el veredicto de normalización, con cita textual donde
+      el propio equipo lo documentó.</p>
+
+    <div class="grid" id="grid">
+      <!-- cards injected mirror the dossiers below; written statically for “page at rest” -->
+      <article class="card" data-target="d-ea">
+        <div class="card-top"><h3>edu-air-control</h3>
+          <span class="status warning"><svg viewBox="0 0 12 12"><path d="M6 1l5 9H1z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 4.5v3M6 8.6v.1" stroke="currentColor" stroke-width="1.3"/></svg>Revisar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">7</b></div><div>Tablas<b class="num">38</b></div>
+          <div>BC<b class="num">6</b></div><div>HU<b class="num">18</b></div>
+        </div>
+        <div class="card-note">1NF mencionada al pasar; sin veredicto documentado</div>
+      </article>
+
+      <article class="card" data-target="d-en">
+        <div class="card-top"><h3>energy-monitor</h3>
+          <span class="status good"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Ejemplar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">25</b></div><div>Tablas<b class="num">25</b></div>
+          <div>BC<b class="num">6</b></div><div>HU<b class="num">11</b></div>
+        </div>
+        <div class="card-note">3NF sin excepciones — el más limpio de los 10</div>
+      </article>
+
+      <article class="card" data-target="d-fae">
+        <div class="card-top"><h3>faceattend-edu</h3>
+          <span class="status warning"><svg viewBox="0 0 12 12"><path d="M6 1l5 9H1z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 4.5v3M6 8.6v.1" stroke="currentColor" stroke-width="1.3"/></svg>Revisar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">29</b></div><div>Tablas<b class="num">30</b></div>
+          <div>BC<b class="num">8</b></div><div>HU<b class="num">39</b></div>
+        </div>
+        <div class="card-note">Modelo más grande del grupo, sin assessment propio</div>
+      </article>
+
+      <article class="card" data-target="d-rtm">
+        <div class="card-top"><h3>rent-car</h3>
+          <span class="status good"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Ejemplar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">25</b></div><div>Tablas<b class="num">26</b></div>
+          <div>BC<b class="num">7</b></div><div>HU<b class="num">32</b></div>
+        </div>
+        <div class="card-note">3NF con revisión de instructor documentada</div>
+      </article>
+
+      <article class="card" data-target="d-sy">
+        <div class="card-top"><h3>save-your-water</h3>
+          <span class="status good"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Sólido</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">16</b></div><div>Tablas<b class="num">31</b></div>
+          <div>BC<b class="num">11</b></div><div>HU<b class="num">59</b></div>
+        </div>
+        <div class="card-note">3NF con 4 denormalizaciones documentadas (D1–D4)</div>
+      </article>
+
+      <article class="card" data-target="d-sg">
+        <div class="card-top"><h3>school-guardian</h3>
+          <span class="status critical"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.6"/></svg>Vacío</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">0</b></div><div>Tablas<b class="num">0</b></div>
+          <div>BC<b class="num">0</b></div><div>HU<b class="num">0</b></div>
+        </div>
+        <div class="card-note">Un solo commit en la vida del repo: el scaffold</div>
+      </article>
+
+      <article class="card" data-target="d-trans">
+        <div class="card-top"><h3>translates-sign-language</h3>
+          <span class="status good"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Ejemplar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">16</b></div><div>Tablas<b class="num">29</b></div>
+          <div>BC<b class="num">8</b></div><div>HU<b class="num">53</b></div>
+        </div>
+        <div class="card-note">3NF+BCNF, autocrítico — el más riguroso</div>
+      </article>
+
+      <article class="card" data-target="d-veh">
+        <div class="card-top"><h3>vehicle-washing</h3>
+          <span class="status good"><svg viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Sólido</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">10</b></div><div>Tablas<b class="num">43</b></div>
+          <div>BC<b class="num">9</b></div><div>HU<b class="num">21</b></div>
+        </div>
+        <div class="card-note">3NF razonado; 2 términos no cruzan a 06-data</div>
+      </article>
+
+      <article class="card" data-target="d-wal">
+        <div class="card-top"><h3>woman-alert</h3>
+          <span class="status warning"><svg viewBox="0 0 12 12"><path d="M6 1l5 9H1z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 4.5v3M6 8.6v.1" stroke="currentColor" stroke-width="1.3"/></svg>Revisar</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">27</b></div><div>Tablas<b class="num">27</b></div>
+          <div>BC<b class="num">7</b></div><div>HU<b class="num">16</b></div>
+        </div>
+        <div class="card-note">3NF exhaustivo pero mecánico; confunde FK nulable con denormalización</div>
+      </article>
+
+      <article class="card" data-target="d-yev">
+        <div class="card-top"><h3>your-event</h3>
+          <span class="status critical"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.6"/></svg>No verificable</span></div>
+        <div class="card-stats">
+          <div>Entidades<b class="num">0</b></div><div>Tablas<b class="num">0–3</b></div>
+          <div>BC<b class="num">0</b></div><div>HU<b class="num">30*</b></div>
+        </div>
+        <div class="card-note">Modelo real declarado en un repo externo, no en yev-docs</div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-no">02</span><h2>Patrones transversales</h2></div>
+    <p class="section-intro">Dos cosas aparecen en más de un proyecto y conviene nombrarlas una
+      sola vez antes del detalle por equipo.</p>
+
+    <div class="finding">
+      <h4>Los microservicios casi nunca se nombran en 01-context</h4>
+      <p style="font-size:.92rem;margin:0">De los 10 equipos, <b>solo edu-air-control</b> nombra
+        microservicios explícitamente en <code>01-context/overview.md</code>. Los otros 9 dejan
+        esa decisión enteramente a <code>02-domain/domain-map.md</code>. No es necesariamente un
+        error del framework, pero es una asimetría real: en 9 de 10 repos, leer solo
+        <code>01-context</code> no dice cuántos servicios hay ni cómo se llaman.</p>
+    </div>
+
+    <div class="finding">
+      <h4>Donde sí se nombran dos veces, los nombres no coinciden</h4>
+      <p style="font-size:.92rem">edu-air-control es el único caso verificable — y falla en 4 de
+        6 servicios:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>01-context/overview.md</th><th>02-domain/domain-map.md</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">ms-usuarios</td><td class="mono">ms-security <span style="color:var(--muted)">y</span> ms-usuarios</td></tr>
+            <tr><td class="mono">ms-aulas</td><td class="mono">ms-classroom-management</td></tr>
+            <tr><td class="mono">ms-sensores</td><td class="mono">ms-sensor-management</td></tr>
+            <tr><td class="mono">ms-monitoreo</td><td class="mono">ms-environment-monitoring <span style="color:var(--muted)">(+ ms-alert, no mencionado en 01)</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.9rem;color:var(--muted);margin-top:8px">Español e inglés mezclados
+        para referirse exactamente al mismo servicio, dentro del mismo repo.</p>
+    </div>
+
+    <div class="finding">
+      <h4>La deriva de nombres también cruza de dominio a datos</h4>
+      <p style="font-size:.92rem;margin:0">En vehicle-washing, la entidad <code>Booking</code> de
+        <code>02-domain</code> —descrita como <em>“the central transaction of the whole
+        platform”</em>— nunca aparece como <code>booking</code> en <code>06-data</code>: se llama
+        <code>reserve</code> / <code>reserve.reserve_service</code>. Mismo patrón que arriba, esta
+        vez entre el vocabulario de dominio (la propia <em>Ubiquitous Language</em> del framework)
+        y el modelo físico.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-no">03</span><h2>Expediente por equipo</h2></div>
+    <p class="section-intro">Los 10 proyectos, en detalle. Cada expediente cruza entidades,
+      tablas, trazabilidad de requisitos y — donde el equipo lo escribió — su propio análisis de
+      normalización, citado textualmente.</p>
+
+    <details class="dossier" id="d-ea">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>edu-air-control</span>
+        <span class="quickstats"><span>76 commits</span><span>7 ent.</span><span>38 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>7 entidades</b> (<code>User</code>, <code>EducationalEnvironment</code>,
+          <code>EnvironmentData</code>, <code>EnvironmentalDataAnalysis</code>, <code>Sensor</code>,
+          <code>Variable</code>, <code>VariableThreshold</code>) sobre <b>6 bounded contexts</b>
+          (IAM, Monitoring, Data Analysis, Classrooms, Sensors, UX).</p>
+
+        <h4>06-data</h4>
+        <p><b>38 tablas</b>, repartidas de forma desigual entre dos notaciones distintas dentro
+          del mismo repo: el núcleo de negocio (<code>environment_measurement</code>,
+          <code>environmental_analysis</code>, <code>variable_threshold</code>…) está en
+          <b>notación DBML</b> dentro de <code>ms-environment-monitoring.md</code>, mientras que
+          IAM/Alert/Classroom/UX usan <code>CREATE TABLE</code> SQL con su propio diccionario de
+          datos al lado. Solo la segunda notación trae esa documentación adicional.</p>
+
+        <h4>Normalización</h4>
+        <p>Sin <code>normalization-assessment.md</code>. Única mención explícita, suelta en
+          prosa dentro de <code>ms-environment-monitoring.md</code>:</p>
+        <p class="quote">“[serían] atributos separados en la misma fila de la tabla, porque eso
+          violaría el principio de 1NF”</p>
+        <p style="font-size:.88rem;color:var(--muted)">Se razona en el momento, pero no queda
+          como decisión documentada — a diferencia de los 5 equipos con archivo dedicado.</p>
+
+        <h4>Trazabilidad 04→06</h4>
+        <p style="font-size:.92rem">De las 7 entidades, la matriz de trazabilidad solo cita por
+          nombre a <code>User</code>, <code>Sensor</code> y <code>Variable</code>.
+          <code>EnvironmentData</code> y <code>EnvironmentalDataAnalysis</code> — el corazón del
+          producto — no aparecen citadas ahí, aunque sí tienen HU dedicadas en prosa.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-en">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>energy-monitor</span>
+        <span class="quickstats"><span>92 commits</span><span>25 ent.</span><span>25 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>25 entidades, 25 tablas</b> — calce 1:1 casi perfecto, el único de los 10 con cero
+          entidades sin tabla evidente. 6 bounded contexts, 11 HU
+          (<code>HU1</code>–<code>HU10</code>, funcionales y no funcionales).</p>
+
+        <h4>Normalización — la más limpia de las 10</h4>
+        <p style="font-size:.92rem">No infla la sección con denormalizaciones inventadas:</p>
+        <p class="quote">“As of this writing, the schema has no intentional denormalization —
+          every table is in 3NF. This is stated plainly rather than manufactured content to fill
+          the section.”</p>
+        <p style="font-size:.92rem">Verifica 1NF, 2NF y 3NF con ejemplos reales del propio
+          esquema (<code>user_system_role</code> como tabla puente en vez de una columna
+          <code>roles</code> separada por comas; <code>home_type_id</code> en vez de repetir el
+          nombre del tipo en cada <code>home</code>). Distingue con precisión una decisión que
+          <b>parece</b> denormalización y no lo es (la FK cross-context de <code>alert.home_id</code>
+          sin reforzar a nivel de motor) de una que sí lo sería si se hiciera (cachear
+          <code>home_name</code> en <code>alert</code>) — y deja escrito qué requeriría
+          documentar si algún día se hace.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-fae">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>faceattend-edu</span>
+        <span class="quickstats"><span>11 commits</span><span>29 ent.</span><span>30 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>29 entidades</b> — el segundo modelo más grande del conjunto — en
+          <b>8 contextos</b> numerados (el repo usa su propia convención “Entity Map by
+          Context” en vez del encabezado estándar <code>### Bounded Context:</code>). 30 tablas,
+          calce casi total: solo <code>Facial_Embedding</code> y
+          <code>Fingerprint_Embedding</code> (contexto Biométrico) no tienen tabla evidente —
+          señal a confirmar a mano, porque datos biométricos a veces se modelan fuera del
+          relacional por diseño, no por omisión.</p>
+
+        <h4>Normalización</h4>
+        <p style="font-size:.92rem">Sin <code>normalization-assessment.md</code> propio. Con 39
+          HU y 29 entidades sin ese control de calidad dedicado, es el equipo con más superficie
+          de datos sin verificación explícita — aunque el archivo central
+          <code>06-data/models.md</code> sigue siendo un resumen sin diligenciar mientras el
+          detalle real vive en los archivos por dominio (<code>domains/01-identity.md</code>…
+          <code>08-configuration.md</code>).</p>
+        <p style="font-size:.88rem;color:var(--muted)">11 commits para 30 tablas + 39 HU es un
+          ritmo de “pocos commits grandes” — coherente con lo que se ve en translates-sign-language:
+          puede ser trabajo hecho fuera de git y subido de una vez, no necesariamente menor
+          esfuerzo real.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-rtm">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>rent-car</span>
+        <span class="quickstats"><span>35 commits</span><span>25 ent.</span><span>26 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>25 entidades, 26 tablas</b>, calce perfecto. 7 bounded contexts, 32 HU.</p>
+
+        <h4>Normalización — la única revisión externa documentada de los 10</h4>
+        <p class="quote">“An instructor's normalization pass over Mer.dbml proposed several
+          changes: some were adopted, some were rejected with a documented reason, one was
+          adopted then reverted.”</p>
+        <dl class="dl">
+          <dt>1NF corregida</dt><dd><code>branch.schedules</code> (un <code>varchar</code> libre
+            tipo “Mon-Fri 8am-6pm”) se separó en <code>branch_operating_hour</code>, una fila por
+            día.</dd>
+          <dt>3NF corregida</dt><dd><code>category_id</code>/<code>engine_type_id</code> se
+            movieron de <code>vehicle</code> a <code>vehicle_model</code>: son propiedades del
+            modelo, no de la unidad física.</dd>
+          <dt>Rechazada, con razón</dt><dd>Convertir cada <code>status</code> en tabla catálogo —
+            rechazado porque son máquinas de estado que controla el código, no datos editables
+            por un Admin.</dd>
+          <dt>Denormalización adoptada</dt><dd>4 FKs nulables en <code>notification</code> en vez
+            de una FK polimórfica, porque el motor no puede validar integridad referencial de
+            una FK polimórfica.</dd>
+        </dl>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-sy">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>save-your-water</span>
+        <span class="quickstats"><span>32 commits</span><span>16 ent.</span><span>31 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>16 entidades</b> sobre <b>11 bounded contexts</b> (<code>BC-01</code>–<code>BC-11</code>,
+          con <code>BC-10</code> marcado explícitamente como “no tiene tablas, lee de
+          monitoring” — consistencia interna correcta). <b>31 tablas</b>, calce completo: los
+          “sin tabla evidente” que marca el detector automático son falsos positivos por sufijos
+          de entrega (<code>Goal *(Entrega 2)*</code> vs tabla <code>goals.consumption_goals</code>).</p>
+
+        <h4>Normalización</h4>
+        <p style="font-size:.92rem">Sin archivo dedicado, pero sí una tabla de <b>4
+          denormalizaciones documentadas</b> (<code>D1</code>–<code>D4</code>) al inicio de
+          <code>models.md</code>, cada una con motivo (ej. <code>D1</code>: <code>place_id</code>
+          duplicado en <code>monitoring.readings</code> “para evitar JOIN a devices en cada
+          consulta de lectura”). Es un assessment real, solo que integrado en otro archivo.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-sg">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>school-guardian</span>
+        <span class="quickstats"><span style="color:var(--critical);font-weight:600">0 commits reales</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>El hallazgo más severo del informe.</b> El repo <code>sg-docs</code> tiene
+          <b>un solo commit en toda su historia</b>: el scaffold del instructor (2026-08-25). El
+          equipo no ha hecho ni un commit desde entonces.</p>
+        <p style="font-size:.92rem">Verificado archivo por archivo, no solo por conteo:
+          <code>01-context/overview.md</code>, <code>02-domain/domain-map.md</code>,
+          <code>02-domain/entities-and-rules.md</code>, <code>03-product/vision.md</code>,
+          <code>04-requirements/user-stories.md</code> y <code>06-data/models.md</code>
+          conservan literalmente el texto de plantilla — <code>[System Name]</code>,
+          <code>[Role 1]</code>, <code>### Bounded Context: [Name — e.g.: User Management]</code>
+          — sin un solo reemplazo. Las “HU-001” y “HU-002” que cita
+          <code>traceability-matrix.md</code> son los ejemplos ilustrativos de la propia
+          plantilla, no historias reales.</p>
+        <p style="font-size:.92rem">El repo hermano <code>sg-db</code> tampoco tiene contenido:
+          un commit (“Initial commit”) con solo un <code>README.md</code>.</p>
+        <p style="font-size:.9rem;color:var(--muted)">No hay nada que frentear. La misma ficha ya
+          había mostrado, desde el reporte de juicios, que el tablero, las HU y el ambiente de
+          este equipo no existen como dato real — este informe confirma la misma conclusión
+          desde el lado del repositorio.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-trans">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>translates-sign-language</span>
+        <span class="quickstats"><span>10 commits</span><span>16 ent.</span><span>29 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>16 entidades</b> sobre <b>8 bounded contexts</b>, con el detalle de versionado más
+          cuidado de los 10 (marca qué es nuevo en v1.1, qué se movió de contexto en v1.2, qué
+          está en pausa pendiente de un requisito). 57 referencias de tabla en bruto → <b>29
+          tablas distintas</b> (la duplicación viene de tener a la vez un <code>.dbml</code>
+          completo y archivos <code>domains/*.md</code> con el mismo esquema).</p>
+
+        <h4>Normalización — el análisis más riguroso de los 10</h4>
+        <p style="font-size:.92rem">Reclama 1NF, 2NF, 3NF <b>y BCNF</b>, documenta 4
+          denormalizaciones al nivel de rent-car, y va un paso más allá en dos puntos que ningún
+          otro equipo hace:</p>
+        <ul class="tight">
+          <li><b>Señala su propia inconsistencia:</b>
+            <span class="quote" style="display:block;margin-top:4px">“usage_daily_stats,
+            session_daily_stats… they also currently contradict the domain map — DATA-03”</span>
+            con enlace a un archivo <code>open-items.md</code> donde queda registrado el
+            pendiente. Es el único equipo que deja escrito, dentro del propio
+            <code>06-data</code>, un hueco de consistencia consigo mismo.</li>
+          <li><b>Encuentra un bug real de agregación:</b> la columna <code>unique_users</code> de
+            sus tablas de rollup no es sumable entre secciones o días sin contar dos veces al
+            mismo usuario, documentado como <em>“a plausible, wrong number that nobody
+            notices”</em>, con dos salidas propuestas (recalcular desde el evento crudo, o un
+            sketch HLL mergeable).</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-veh">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>vehicle-washing</span>
+        <span class="quickstats"><span>37 commits</span><span>10 ent.</span><span>43 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>10 entidades</b> de alto nivel en <code>02-domain</code> que se despliegan en
+          <b>43 tablas distintas</b> en <code>06-data</code> (9 bounded contexts, 8 esquemas SQL
+          Server) — la relación entidad:tabla más alta de los 10 (≈1:4), coherente con un
+          dominio transaccional donde cada entidad se apoya en varias tablas de
+          catálogo/estado.</p>
+
+        <h4>Normalización sólida</h4>
+        <p style="font-size:.92rem">Mismo estilo de razonamiento por trade-off que rent-car:
+          explica por qué <code>catalog.service</code> no tiene columna <code>price</code>
+          (depende del par servicio + tipo de vehículo, no del servicio solo), por qué
+          <code>execution.operator</code> no duplica <code>person_id</code> aunque sea
+          alcanzable en un salto (evitar una segunda ruta a la misma verdad), y documenta 4
+          denormalizaciones intencionales con su mecanismo de honestidad.</p>
+
+        <h4>Dos términos que no cruzan limpio a 06-data</h4>
+        <ul class="tight">
+          <li><code>Booking</code> (dominio) = <code>reserve</code> (datos) — ver §02.</li>
+          <li><code>Rating</code> es una entidad propia en <code>02-domain</code>, con su propio
+            agregado e invariante (“como máximo una calificación por booking completado”), pero
+            en <code>06-data</code> no existe tabla <code>rating</code>: son tres columnas
+            (<code>quality_rating</code>, <code>quality_comment</code>, <code>rated_at</code>)
+            sobre <code>execution.service_execution</code>. Decisión defendible — una
+            calificación no existe fuera del servicio que califica— pero no está señalada como
+            decisión en ningún documento leído.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-wal">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>woman-alert</span>
+        <span class="quickstats"><span>21 commits</span><span>27 ent.</span><span>27 tablas</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>27 entidades, 27 tablas</b>, calce perfecto — el modelo más grande en número de
+          entidades de los 10. 7 bounded contexts, 16 HU.</p>
+
+        <h4>Normalización — completa pero mecánica</h4>
+        <p style="font-size:.92rem">Su <code>normalization-assessment.md</code> (338 líneas) pasa
+          tabla por tabla afirmando 3NF con la misma fórmula repetida (“Primary key: id… All
+          attributes depend on id… Correctly normalized” ×12), sin el nivel de trade-off que sí
+          tienen rent-car, vehicle-washing o translates-sign-language.</p>
+        <p style="font-size:.92rem"><b>Error conceptual que se repite tres veces:</b> el
+          documento llama “denormalización intencional” a tener una <b>FK nulable</b>
+          (<code>alert_id</code> nulable en <code>location_log</code> y en
+          <code>notification</code>, para el caso sin alerta activa). Una FK nulable no es una
+          denormalización — es una relación opcional, sin dato duplicado ni dependencia
+          transitiva. El esquema probablemente está bien; la justificación técnica, tal como
+          está escrita, no.</p>
+      </div>
+    </details>
+
+    <details class="dossier" id="d-yev">
+      <summary class="dossier-head">
+        <span class="name"><svg class="chevron" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>your-event</span>
+        <span class="quickstats"><span style="color:var(--critical);font-weight:600">modelo fuera del repo</span></span>
+      </summary>
+      <div class="dossier-body">
+        <p><b>El otro caso severo, distinto al de school-guardian.</b> Confirmado archivo por
+          archivo: <code>01-context/overview.md</code>, <code>01-context/scope.md</code>,
+          <code>02-domain/domain-events.md</code>, <code>02-domain/entities-and-rules.md</code> y
+          <code>06-data/models.md</code> — los archivos canónicos — <b>siguen siendo la
+          plantilla sin diligenciar</b> (mismo patrón de corchetes que school-guardian).</p>
+        <p style="font-size:.92rem">Pero a diferencia de school-guardian, sí hay trabajo real:
+          vive en una carpeta paralela <code>evidence/</code> que el equipo agregó por su
+          cuenta, fuera de la estructura esperada. Las 30 HU reales de este informe salen de
+          <code>04-requirements/evidence/user-stories.md</code>, no del archivo canónico.</p>
+        <p style="font-size:.92rem"><b>El detalle que rompe la trazabilidad:</b>
+          <code>06-data/evidence/models.md</code> declara que su fuente primaria son scripts SQL,
+          un diagrama ER y un diccionario de datos Excel en
+          <code>TuEvento-Docs/05_Diseno_Software/…</code> — un repositorio que <b>no es
+          yev-docs</b> y no está enlazado como parte verificable de <code>code-sena</code>. El
+          modelo de datos real de your-event no es auditable desde el repo que la ficha usa como
+          fuente de verdad.</p>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-no">04</span><h2>Ranking de normalización</h2></div>
+    <p class="section-intro">Solo los 8 equipos con modelo real. El orden no es por tamaño del
+      modelo, sino por rigor del razonamiento.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:36px"></th><th>Equipo</th><th>Veredicto</th><th>Por qué en ese lugar</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank-n">1</span></td><td><b>translates-sign-language</b></td><td class="mono" style="font-size:.78rem">3NF+BCNF</td><td>Único que documenta su propia inconsistencia (DATA-03) y encuentra un bug real de agregación no pedido</td></tr>
+          <tr><td><span class="rank-n">2</span></td><td><b>rent-car</b></td><td class="mono" style="font-size:.78rem">3NF</td><td>Única revisión externa (instructor) documentada, con adopciones y rechazos explícitos</td></tr>
+          <tr><td><span class="rank-n">3</span></td><td><b>energy-monitor</b></td><td class="mono" style="font-size:.78rem">3NF</td><td>El más limpio: cero denormalización y lo dice sin inflar la sección</td></tr>
+          <tr><td><span class="rank-n">4</span></td><td><b>vehicle-washing</b></td><td class="mono" style="font-size:.78rem">3NF</td><td>Mismo nivel de trade-off que rent-car, con 2 términos sueltos de vocabulario</td></tr>
+          <tr><td><span class="rank-n">5</span></td><td><b>save-your-water</b></td><td class="mono" style="font-size:.78rem">3NF</td><td>Buen análisis, pero integrado en models.md y no en documento propio</td></tr>
+          <tr><td><span class="rank-n">6</span></td><td><b>woman-alert</b></td><td class="mono" style="font-size:.78rem">3NF</td><td>Completo en cobertura, débil en el razonamiento; confunde FK nulable con denormalización</td></tr>
+          <tr><td><span class="rank-n">7</span></td><td><b>edu-air-control</b></td><td class="mono" style="font-size:.78rem">—</td><td>1NF mencionada al pasar, sin documento dedicado, pese a 76 commits</td></tr>
+          <tr><td><span class="rank-n">8</span></td><td><b>faceattend-edu</b></td><td class="mono" style="font-size:.78rem">—</td><td>Modelo grande (29 entidades) sin ningún control de normalización documentado</td></tr>
+          <tr class="row-critical"><td>—</td><td><b>school-guardian</b></td><td class="mono" style="font-size:.78rem">n/a</td><td>No hay modelo</td></tr>
+          <tr class="row-critical"><td>—</td><td><b>your-event</b></td><td class="mono" style="font-size:.78rem">n/a</td><td>El modelo declarado no vive en este repo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-no">05</span><h2>Conclusiones transversales</h2></div>
+    <ul class="tight" style="font-size:.96rem">
+      <li><b>La actividad de commits no predice la calidad del análisis.</b>
+        translates-sign-language (10 commits) y rent-car (35) están en el top del ranking;
+        edu-air-control (76 commits) y faceattend-edu (11) no tienen veredicto de normalización
+        pese a tener modelos grandes.</li>
+      <li><b>“Plantilla sin diligenciar” tiene dos variantes que conviene no tratar igual:</b>
+        school-guardian es inactividad total (0 commits reales); your-event sí trabajó, pero
+        fuera de la estructura esperada y con la fuente de verdad en un repositorio externo no
+        verificable desde aquí.</li>
+      <li><b>La inconsistencia de nombres entre secciones es real pero puntual</b>, no
+        generalizada: solo se pudo verificar donde el equipo se atrevió a nombrar la misma cosa
+        dos veces. La mayoría evita el problema no nombrando microservicios en
+        <code>01-context</code> en absoluto — su propio tipo de brecha, solo que invisible al
+        cruce automático.</li>
+      <li><b>Los 5 equipos con <code>normalization-assessment.md</code> propio son, sin
+        excepción, los que además tienen la trazabilidad entidad↔tabla más limpia.</b> Escribir
+        el documento de normalización parece forzar, como efecto colateral, una revisión del
+        modelo que atrapa huecos de nomenclatura antes de que lleguen a este informe.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Correlación con el reporte de juicios de la ficha:</b> school-guardian (0 commits
+      reales) es consistente con lo que ya mostraba el reporte de juicios evaluativos de
+      ADSO-3145556 — la misma ficha donde ya se había detectado que el tablero, las HU y el
+      ambiente no existen como dato real para ese equipo.</p>
+    <p>Método: los 10 repos <code>{prefijo}-docs</code> se clonaron en un snapshot local de solo
+      lectura (nada se escribió en GitHub). Entidades, tablas, bounded contexts y HU se
+      extrajeron por nombre y se verificaron a mano; el detector de plantilla sin diligenciar
+      (heurística de placeholders) se confirmó archivo por archivo en los dos casos donde
+      importaba. Actividad real = commits excluyendo el commit único de scaffold del
+      instructor.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.card').forEach(function(card){
+    card.setAttribute('tabindex','0');
+    card.setAttribute('role','button');
+    var open = function(){
+      var id = card.getAttribute('data-target');
+      var target = document.getElementById(id);
+      if(!target) return;
+      target.open = true;
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); }
+    });
+  });
+})();
+</script>

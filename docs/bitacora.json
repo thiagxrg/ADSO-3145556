@@ -1,0 +1,20 @@
+[
+  {
+    "fecha": "2026-09-08",
+    "ruta": "2026-09-08-congruencia-datamodel",
+    "titulo": "Congruencia 02-03-06 y contrapropuesta de modelo de datos",
+    "resumen": "Evaluacion de dominio, producto y datos en los 10 proyectos de la ficha, con nivel de normalizacion actual y una contrapropuesta de 06.md en 3FN para cada equipo.",
+    "archivos": 22,
+    "autor": "Jesús Ariel González Bonilla",
+    "creado_en": "2026-09-08T17:07:13-05:00"
+  },
+  {
+    "fecha": "2026-09-22",
+    "ruta": "2026-09-22-consistencia-01-06-data-y-recorte-a-microservicios",
+    "titulo": "Consistencia 01-06-data y recorte a microservicios",
+    "resumen": "Cruce 01-context/02-domain/03-product/04-requirements contra 06-data en los 10 proyectos, con normalizacion por equipo; mas 4 dominios reales y modelo 3FN sin seguridad/parametrizacion para llevar cada proyecto a microservicios.",
+    "archivos": 36,
+    "autor": "Jesús Ariel González Bonilla",
+    "creado_en": "2026-09-22T15:32:39-05:00"
+  }
+]
